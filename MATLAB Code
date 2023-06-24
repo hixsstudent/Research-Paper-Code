@@ -1,0 +1,102 @@
+%to be implemented on MATLAB
+%MINIMUM ODR bandgap: always between TE at normal incidence and TM at 90 degrees. All bandgaps at other angles contain this section. 
+
+% Section 1: Transverse Electric computation 
+
+clear;
+io=sqrt(-1);
+angle=0;%angle of incidence from the ambient layer
+o1=1;
+theta=pi.*angle./180;
+mt=-1; %-1for TE and 1 for TM
+nl=10; % NO. OF CELLS
+n1=1;  %refractive index of the ambient medium
+d1=800/(4*2.08);
+d2=800/(4*1.45);
+rr=[3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45];
+ri=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+d=[d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2];
+dl=0;
+for wl=413:.1:1117
+for i=1:nl
+ rind(i)=complex(rr(i),-ri(i));
+ dl=dl+d(i);
+end
+theta1=(asin(n1*sin(theta)/rind(1)));
+theta2=(asin(rind(1)*sin(theta1)/rind(2)));
+thetaa=[theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2];
+rk=2*pi/wl;
+for ej=1:nl
+ ak(ej)=(rk*rind(ej)*cos(thetaa(ej)));
+end
+if(mt<0)
+etaa=(ak(nl-1)/ak(nl));
+else
+etaa=((ak(nl-1)/ak(nl))*((rind(nl)^2/rind(nl-1)^2)));
+end
+for oo=2:nl
+ii=oo-1;
+p=(exp(io*ak(ii)*d(ii))*(cos(ak(oo)*d(oo))+(0.5*io*(etaa+(1/etaa))*sin(ak(oo)*d(oo)))));
+q=(exp(-io*ak(ii)*d(ii))*(0.5*io*(etaa-(1/etaa))*sin(ak(oo)*d(oo))));
+r=(exp(io*ak(ii)*d(ii))*(-0.5*io*(etaa-(1/etaa))*sin(ak(oo)*d(oo))));
+s=(exp(-io*ak(ii)*d(ii))*(cos(ak(oo)*d(oo))-(0.5*io*(etaa+(1/etaa))*sin(ak(oo)*d(oo)))));
+kw=(1/dl)*acos((cos(ak(ii)*d(ii))*cos(ak(oo)*d(oo)))-(0.5*(etaa+(1/etaa))*(sin(ak(ii)*d(ii))*sin(ak(oo)*d(oo)))));
+end
+kw1(o1)=kw*dl/(2*pi);
+kwi(o1)=imag(kw*dl/(2*pi));
+vin=[p,q;r,s]^nl;
+ref1(o1)=(abs((vin(3)/vin(1))))^2;
+refi1(o1)=(imag((vin(3)/vin(1))))^2;
+%trns(o)=1-ref(o);
+w1(o1)=wl;
+o1=o1+1;
+end
+angle=90;%angle of incidence from the ambient layer. Changed here so TM is generated at 90 degrees and not 0. 
+o2=1;
+theta=pi.*angle./180;
+mt=1;%-1for TE and 1 for TM
+
+%Section 2: Transverse magnetic computation
+
+nl=10;% NO. OF CELLS
+n1=1;%refractive index of the ambient medium
+d1=800/(4*2.08);
+d2=800/(4*1.45);
+rr=[3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45,3.42,1.45];
+ri=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+d=[d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2,d1,d2];
+dl=0;
+for wl=413:.1:1117
+for i=1:nl
+rind(i)=complex(rr(i),-ri(i));
+dl=dl+d(i);
+end
+theta1=(asin(n1*sin(theta)/rind(1)));
+theta2=(asin(rind(1)*sin(theta1)/rind(2)));
+thetaa=[theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2,theta1,theta2];
+rk=2*pi/wl;
+for ej=1:nl
+ak(ej)=(rk*rind(ej)*cos(thetaa(ej)));
+end
+if(mt<0)
+etaa=(ak(nl-1)/ak(nl));
+else
+etaa=((ak(nl-1)/ak(nl))*((rind(nl)^2/rind(nl-1)^2)));
+end
+for oo=2:nl
+ii=oo-1;
+p=(exp(io*ak(ii)*d(ii))*(cos(ak(oo)*d(oo))+(0.5*io*(etaa+(1/etaa))*sin(ak(oo)*d(oo)))));
+q=(exp(-io*ak(ii)*d(ii))*(0.5*io*(etaa-(1/etaa))*sin(ak(oo)*d(oo))));
+r=(exp(io*ak(ii)*d(ii))*(-0.5*io*(etaa-(1/etaa))*sin(ak(oo)*d(oo))));
+s=(exp(-io*ak(ii)*d(ii))*(cos(ak(oo)*d(oo))-(0.5*io*(etaa+(1/etaa))*sin(ak(oo)*d(oo)))));
+kw=(1/dl)*acos((cos(ak(ii)*d(ii))*cos(ak(oo)*d(oo)))-(0.5*(etaa+(1/etaa))*(sin(ak(ii)*d(ii))*sin(ak(oo)*d(oo)))));
+end
+kw2(o2)=kw*dl/(2*pi);
+vin=[p,q;r,s]^nl;
+ref2(o2)=(abs((vin(3)/vin(1))))^2;
+refi2(o2)=(imag((vin(3)/vin(1))))^2;
+%trns(o)=1-ref(o);
+w2(o2)=wl;
+o2=o2+1;
+end
+plot(w1,ref1,'b',w2,ref2,'r')
